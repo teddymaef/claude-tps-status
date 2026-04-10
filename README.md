@@ -24,7 +24,7 @@ TPS  ↑ 38/s  ↓ 104/s  ↯ 336/s  ⧖ 2.0s  claude-sonnet-4-6
 ## Installation
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/claude-tps-status.git ~/git/claude-tps-status
+git clone https://github.com/teddymaef/claude-tps-status.git ~/git/claude-tps-status
 ```
 
 Open the cloned folder in Claude Code and run `/install`. Restart Claude Code when done.
