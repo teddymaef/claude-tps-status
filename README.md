@@ -49,6 +49,10 @@ bash -x ~/git/claude-tps-status/tps-status.sh
 
 State files live in `/tmp/tps-status-<md5hash>.state` — one per session JSONL. Delete them to reset the displayed averages.
 
+## License
+
+MIT License — see [LICENSE](LICENSE) file for details.
+
 ## Acknowledgements
 
 Inspired by [TomzxCode/tps-viewer](https://github.com/TomzxCode/tps-viewer) — a standalone TPS visualization tool for Claude Code.
