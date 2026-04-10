@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Derive project folder from CWD (matches Claude Code's naming convention)
-PROJECT_SLUG=$(echo "$PWD" | tr '/' '-')
+PROJECT_SLUG=$(pwd -P | tr '/' '-')
 PROJECT_DIR="$HOME/.claude/projects/$PROJECT_SLUG"
 
 [ -d "$PROJECT_DIR" ] || exit 0
