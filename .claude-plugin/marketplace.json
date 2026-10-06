@@ -1,0 +1,13 @@
+{
+  "name": "claude-tps-status",
+  "owner": {
+    "name": "Teddy Ma"
+  },
+  "description": "tps-status: token throughput for the current Claude Code session",
+  "plugins": [
+    {
+      "name": "tps-status",
+      "source": "./"
+    }
+  ]
+}

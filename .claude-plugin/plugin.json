@@ -1,0 +1,9 @@
+{
+  "name": "tps-status",
+  "version": "0.3.0",
+  "description": "Shows this session's token throughput (input/output tok/s, generation speed, first-token latency) beside the mode labels in the prompt footer",
+  "author": { "name": "Teddy Ma" },
+  "license": "MIT",
+  "repository": "https://github.com/teddymaef/claude-tps-status",
+  "types": "./types/index.d.ts"
+}

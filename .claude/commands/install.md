@@ -1,22 +1,22 @@
-Install the tps-status statusline script into Claude Code.
+Install the tps-status mod from this folder into Claude Code.
 
-1. Check that `jq` is installed by running `which jq`. If it is not found, tell the user to run `brew install jq` and stop — do not proceed further.
+1. Check the folder is the mod: run `claude plugin validate "$PWD"`. If it does not end with `✔ Validation passed`, show the output to the user and stop.
 
-2. Make the script executable:
+2. Add this folder as a marketplace, at the user scope:
    ```bash
-   chmod +x "$PWD/tps-status.sh"
+   claude plugin marketplace add "$PWD"
    ```
+   If it reports that the marketplace `claude-tps-status` already exists, that is fine: refresh it instead with `claude plugin marketplace update claude-tps-status`, so the installed copy picks up the folder's current files.
 
-3. Read `~/.claude/settings.json`. If the file does not exist, treat its contents as `{}`. Parse the JSON and set the `statusLine` key to:
-   ```json
-   {
-     "type": "command",
-     "command": "<absolute-path-to-tps-status.sh>"
-   }
+3. Install the mod at the user scope:
+   ```bash
+   claude plugin install tps-status@claude-tps-status
    ```
-   where `<absolute-path-to-tps-status.sh>` is `$PWD/tps-status.sh` with `$PWD` expanded to the real current directory path. Preserve all other existing top-level keys. Write the result back to `~/.claude/settings.json`.
+   If it reports that the plugin is already installed, run `claude plugin update tps-status@claude-tps-status` instead.
 
-4. Print a confirmation message:
+4. Read `~/.claude/settings.json`. If it has a `statusLine` whose `command` ends in `tps-status.sh` (the older script from this repo), tell the user that it would show the same figures twice and ask whether to remove it. Only on a yes, delete the `statusLine` key, keep every other key, and write the file back.
+
+5. Print a confirmation message:
    ```
-   Installed. The statusline is wired to <absolute-path>. Restart Claude Code to see TPS metrics.
+   Installed tps-status from <absolute path of this folder>. The TPS line appears at the right of the prompt footer once a turn finishes; restart Claude Code if it does not show in this session.
    ```
