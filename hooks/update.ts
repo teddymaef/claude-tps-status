@@ -14,6 +14,27 @@ export function marketplaceOf(root: string): string | undefined {
   return /\/plugins\/cache\/([^/]+)\/[^/]+\/[^/]+\/?$/.exec(root)?.[1]
 }
 
+/**
+ * The install record file for a copy run from the plugin cache
+ * (`<config>/plugins/cache/…` → `<config>/plugins/installed_plugins.json`).
+ */
+export function installRecordOf(root: string): string | undefined {
+  const m = /^(.*\/plugins)\/cache\/[^/]+\/[^/]+\/[^/]+\/?$/.exec(root)
+  return m ? `${m[1]}/installed_plugins.json` : undefined
+}
+
+/**
+ * The commit a cached copy was installed at, from `installed_plugins.json`:
+ * the record for `id` whose install path is `root`. A GitHub marketplace's
+ * checkout can move ahead of what is installed, so its HEAD is no guide.
+ */
+export function installedSha(json: string, id: string, root: string): string | undefined {
+  const records = JSON.parse(json)?.plugins?.[id]
+  if (!Array.isArray(records)) return undefined
+  const sha = records.find(r => typeof r?.installPath === 'string' && trim(r.installPath) === trim(root))?.gitCommitSha
+  return typeof sha === 'string' ? sha : undefined
+}
+
 export type Marketplace = {
   name?: string
   source?: string
