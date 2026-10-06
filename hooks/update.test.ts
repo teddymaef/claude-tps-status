@@ -1,6 +1,6 @@
 import { test, expect, mock } from 'claude-code/testing'
 import type { On, RenderElement } from 'claude-code'
-import { parseCommit, repoOf, shortDate, sourceFor } from './update'
+import { installRecordOf, installedSha, parseCommit, repoOf, shortDate, sourceFor } from './update'
 
 test('reads owner/repo from a GitHub URL', () => {
   expect(repoOf('https://github.com/teddymaef/claude-tps-status')).toBe('teddymaef/claude-tps-status')
@@ -17,6 +17,25 @@ test('finds where an installed copy updates from', () => {
   expect(sourceFor(list, '/Users/x/git/claude-tps-status/')).toEqual({ kind: 'folder', marketplace: 'local', dir: '/Users/x/git/claude-tps-status' })
   expect(sourceFor(list, '/Users/x/.claude/plugins/cache/gh/tps-status/0.5.0')).toEqual({ kind: 'github', marketplace: 'gh', dir: '/Users/x/.claude/plugins/marketplaces/gh' })
   expect(sourceFor(list, '/Users/x/.claude/dev-mods/abc/tps-status')).toBeUndefined()
+})
+
+test('reads the commit a GitHub install was installed at', () => {
+  const root = '/Users/x/.claude/plugins/cache/gh/tps-status/0.5.0'
+  expect(installRecordOf(root)).toBe('/Users/x/.claude/plugins/installed_plugins.json')
+  expect(installRecordOf('/Users/x/git/claude-tps-status')).toBeUndefined()
+
+  const json = JSON.stringify({
+    version: 2,
+    plugins: {
+      'tps-status@gh': [
+        { scope: 'project', installPath: '/Users/x/.claude/plugins/cache/gh/tps-status/0.4.0', gitCommitSha: 'old' },
+        { scope: 'user', installPath: root, gitCommitSha: 'abc1234def' },
+      ],
+    },
+  })
+  expect(installedSha(json, 'tps-status@gh', `${root}/`)).toBe('abc1234def')
+  expect(installedSha(json, 'tps-status@other', root)).toBeUndefined()
+  expect(installedSha('{}', 'tps-status@gh', root)).toBeUndefined()
 })
 
 test('reads a commit from the GitHub API', () => {

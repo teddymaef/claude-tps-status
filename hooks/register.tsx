@@ -1,7 +1,7 @@
 import { update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 import type { Totals, Update } from '../types'
-import { parseCommit, repoOf, shortDate, sourceFor } from './update'
+import { installRecordOf, installedSha, parseCommit, repoOf, shortDate, sourceFor } from './update'
 import type { Marketplace } from './update'
 
 // Session averages over main-loop turns, held by the host in $.state so a
@@ -53,6 +53,18 @@ async function findSource($: EngineInterface) {
   return sourceFor(JSON.parse(list.out) as Marketplace[], $.plugin.root)
 }
 
+// The commit a GitHub install's cached copy was installed at, when its record
+// says; undefined leaves the check to the marketplace checkout's HEAD.
+async function installedCommit($: EngineInterface, marketplace: string) {
+  const file = installRecordOf($.plugin.root)
+  if (!file) return undefined
+  try {
+    return installedSha(await $.fs.read(file), `tps-status@${marketplace}`, $.plugin.root)
+  } catch {
+    return undefined
+  }
+}
+
 async function checkForUpdate($: EngineInterface): Promise<void> {
   try {
     const now = await $.clock.now()
@@ -69,8 +81,13 @@ async function checkForUpdate($: EngineInterface): Promise<void> {
     const commit = latest.isOk ? parseCommit(latest.out) : undefined
     if (!commit) return
 
-    // Up to date: the clone already holds that commit.
-    const has = await run($, ['git', 'merge-base', '--is-ancestor', commit.sha, 'HEAD'], src.dir)
+    // Up to date: the clone already holds that commit, or for a GitHub
+    // install, the commit it was installed at does.
+    const installed = (src.kind === 'github' && (await installedCommit($, src.marketplace))) || 'HEAD'
+    const has =
+      commit.sha === installed
+        ? { isOk: true }
+        : await run($, ['git', 'merge-base', '--is-ancestor', commit.sha, installed], src.dir)
     const ignored = (await $.store.get(IGNORED)) as { sha?: string } | undefined
     if (has.isOk || ignored?.sha === commit.sha) {
       await $.store.set(LAST_CHECK, now)
